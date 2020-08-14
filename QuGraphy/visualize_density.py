@@ -3,7 +3,7 @@ from QuGraphy.state import *
 import itertools
 
 def visualize_density(array, check=False):
-    if np.ndim(array)[1]==1:
+    if np.shape(array)[1]==1:
         if check==True: check_state(array)
         rho=density(array)
     else:
@@ -52,6 +52,7 @@ def visualize_density(array, check=False):
     ax.set_yticks(range(0, np.shape(rho)[0]))
 
     n_qubits = np.log(np.shape(rho)[0]) / np.log(2)
+    n_qubits=int(n_qubits)
     bases = list(map(list, itertools.product([0, 1], repeat=n_qubits)))
     for i in range(len(bases)):
         bases[i] = ''.join([str(elem) for elem in bases[i]])

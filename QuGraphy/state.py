@@ -3,8 +3,8 @@
 from QuGraphy.density import *    #we may use some functions from them and dependencies
 
 def check_state(state):
-    if np.ndim(state)>1:
+    if np.shape(state)[1]>1:
         raise Exception("invalid state, not a vector!")
 
-    if np.transpose(np.conjugate(state))*state !=1:
+    if schmidt_inner(state,state) !=1:
         raise Exception("invalid state, not normalized!")

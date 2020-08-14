@@ -6,30 +6,30 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 import numpy as np
 #Pauli Matrices
-pauli_x=[
+pauli_x=np.array([
     [0 , 1],
     [1 , 0]
-]
+])
 
-pauli_y=[
+pauli_y=np.array([
     [0 , -1j],
     [1j , 0]
-]
+])
 
-pauli_z=[
+pauli_z=np.array([
     [1 , 0],
     [0 , -1]
-]
+])
 
 #standard basis
-s0=[
+s0=np.array([
     [1],
     [0]
-]
-s1=[
+])
+s1=np.array([
     [0],
     [1]
-]
+])
 #this function will form the density matrix from given states
 def density(*states):
     composite=states[0]
@@ -37,10 +37,6 @@ def density(*states):
         for s in range(len(states)-1):
             composite=np.kron(composite,states[s+1])
     return composite * np.transpose(np.conjugate(composite))
-
-#this function will visualize the density matrix of given state or density
-def density_visualize(array):
-    pass
 
 
 #this function will check is the given density matrix is valid or not
@@ -70,7 +66,8 @@ def check_density(density):
 
 #this function compute the schmidt inner product between two matrices
 def schmidt_inner(A,B):
-    return np.trace(np.transpose(np.conjugate(A))*B)
+    return np.trace(np.dot(np.transpose(np.conjugate(A)),B))
+
 
 #This function will return bloch vector given the density matrix or the state
 def bloch_vector(array,visualize=True):
@@ -144,3 +141,16 @@ def reduce(density,reducing='1'):
         reduce(reduced,reducing=qubits)
 
     return reduced
+
+#this function will calculate the trace distance given two density matrices
+def trace_distance(rho1, rho2):
+
+    A = rho1 - rho2
+    eigA, vecA = LA.eig(A)
+
+    d = 0
+    for j in range(len(eigA)):
+        if (eigA[j] > 0):
+            d = d + eigA[j]
+
+    return d
