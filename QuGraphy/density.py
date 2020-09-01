@@ -1,5 +1,6 @@
 #This python file will contain the functions that make calculations & visualisation related to density matrix
 import numpy as np
+from QuGraphy.state import *
 from numpy import linalg as LA
 from qutip import *  #have matplotlib dependency
 from mpl_toolkits.mplot3d import Axes3D
@@ -71,10 +72,10 @@ def schmidt_inner(A,B):
 
 #This function will return bloch vector given the density matrix or the state
 def bloch_vector(array,visualize=True):
-    if np.ndim(array)==1:
+    if min(np.shape(array))==1:
         array=density(array)
 
-    if np.ndim(array)>2:
+    if np.shape(array)[0]>2:
         raise Exception("invalid Matrix/State, not single qubit!")
 
     v_x=2*schmidt_inner(array,pauli_x)
@@ -107,40 +108,34 @@ def kron_all(list):
     return kroned
 
 
-#this function will compute the reduces states of subsystems in a composite system
-def reduce(density,reducing='1'):
-    global popped
+#this function will compute the partial trace and trace out certain qubit
+def trace_out(density, out='1',check=False):
+    if min(np.shape(density))==1:
+        if check == True: check_state(density)
+        density=density(density)
+    else:
+        if check == True: check_density(density)
 
-    check_density(density)
+    if len(str(out)) > 1:
+        raise Exception("this function only trace out one qubit, if you want more apply it more!")
 
-    reducing = "".join(sorted(str(reducing)))
+    n_qubits = int(np.log(np.shape(density)[0]) / np.log(2))
+    op0 = [[[1, 0], [0, 1]]] * n_qubits
+    op1 = [[[1, 0], [0, 1]]] * n_qubits
 
-    n_qubits = np.log(np.shape(density)[0]) / np.log(2)
-    qubits = ''.join(str(i+1) for i in range(n_qubits))
-    op0 = np.zeros(n_qubits)
-    op1 = np.zeros(n_qubits)
-
-    if int(max(reducing))>n_qubits:
+    if int(out) > n_qubits or '0' in str(out):
         raise Exception("the desired system out of range!")
 
-    for i in range(n_qubits):
-        if str(i+1) not in reducing:
-            op0[i]=s0
-            op1[i]=s1
-            popped=i+1
-            break
+    op0[int(out) - 1] = s0
+    op1[int(out) - 1] = s1
 
-    #make kron operation
-    reduced0 = np.dot( kron_all(op0) , np.dot( density , np.transpose(kron_all(op0))))
-    reduced1 = np.dot( kron_all(op1) , np.dot( density , np.transpose(kron_all(op1))))
+    # make kron operation
+    reduced0 = np.dot(np.transpose(kron_all(op0)), np.dot(density, kron_all(op0)))
+    reduced1 = np.dot(np.transpose(kron_all(op1)), np.dot(density, kron_all(op1)))
     reduced = reduced0 + reduced1
 
-    qubits.replace(str(popped), '')   #this is the current reduces quibits you have
-
-    if qubits != reducing:
-        reduce(reduced,reducing=qubits)
-
     return reduced
+
 
 #this function will calculate the trace distance given two density matrices
 def trace_distance(rho1, rho2):
