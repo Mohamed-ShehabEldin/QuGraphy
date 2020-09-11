@@ -8,7 +8,8 @@ setup(
   author_email='mohamed.sami@zewailcity.edu.eg',
   description='''A collection of Python functions to ease and visualise 
   the calculations of Quantum computation and information''',
-  packages='QuGraphy',
+  packages=['QuGraphy'],
+  url='https://github.com/Mohamed-ShehabEldin/QuGraphy',
   install_requires=[
     'qutip',
     'numpy',
