@@ -1,6 +1,6 @@
 #This python file will contain the functions that make calculations & visualisation related to density matrix
 import numpy as np
-from QuGraphy.state import *
+from .state import *
 from numpy import linalg as LA
 from qutip import *  #have matplotlib dependency
 from mpl_toolkits.mplot3d import Axes3D
