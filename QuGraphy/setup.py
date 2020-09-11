@@ -10,7 +10,6 @@ setup(
   packages=find_packages(),
   install_requires=[
     'qutip',
-    'itertools',
     'numpy',
     'matplotlib'
   ]
