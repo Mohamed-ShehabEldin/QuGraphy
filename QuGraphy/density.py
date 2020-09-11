@@ -109,17 +109,17 @@ def kron_all(list):
 
 
 #this function will compute the partial trace and trace out certain qubit
-def trace_out(density, out='1',check=False):
-    if min(np.shape(density))==1:
-        if check == True: check_state(density)
-        density=density(density)
+def trace_out(rho, out='1',check=False):
+    if min(np.shape(rho))==1:
+        if check == True: check_state(rho)
+        rho=density(rho)
     else:
-        if check == True: check_density(density)
+        if check == True: check_density(rho)
 
     if len(str(out)) > 1:
         raise Exception("this function only trace out one qubit, if you want more apply it more!")
 
-    n_qubits = int(np.log(np.shape(density)[0]) / np.log(2))
+    n_qubits = int(np.log(np.shape(rho)[0]) / np.log(2))
     op0 = [[[1, 0], [0, 1]]] * n_qubits
     op1 = [[[1, 0], [0, 1]]] * n_qubits
 
