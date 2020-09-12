@@ -33,10 +33,10 @@ s1=np.array([
 ])
 #this function will form the density matrix from given states
 def density(*states):
-    composite=states[0]
+    composite=row2col(states[0])
     if len(states)>1:
         for s in range(len(states)-1):
-            composite=np.kron(composite,states[s+1])
+            composite=np.kron(composite,row2col(states[s+1]))
     return composite * np.transpose(np.conjugate(composite))
 
 
@@ -50,7 +50,7 @@ def check_density(density):
     if np.trace(density) != 1:
         raise Exception("invalid Matrix, not unit traced!")
 
-    if np.transpose(np.conjugate(density)) != density:
+    if not np.allclose(np.transpose(np.conjugate(density)), np.array(density)):
         raise Exception("invalid Matrix, not Hermitian!")
 
     if np.shape(density)[0] != np.shape(density)[1]:
@@ -64,6 +64,13 @@ def check_density(density):
 
     if np.shape(density)[0] not in possible_dim:
         print('\033[91m' + "Not a Qubit/s System!" + '\033[0m')
+
+def is_density(rho):
+    try:
+        check_density(rho)
+        return True
+    except:
+        return False
 
 #this function compute the schmidt inner product between two matrices
 def schmidt_inner(A,B):
@@ -84,7 +91,7 @@ def bloch_vector(array,visualize=True):
 
     if visualize==True:
         b = Bloch()   #qutip object
-        b.add_vectors([v_x,v_y,v_z])
+        b.add_vectors(np.real([v_x,v_y,v_z]))
         b.show()
 
     return [v_x, v_y, v_z]
@@ -93,7 +100,7 @@ def bloch_vector(array,visualize=True):
 def is_pure(density):
     check_density(density)
 
-    if np.trace(np.dot(density,density)) ==1:
+    if np.trace(np.dot(density,density)) ==1.0:
         return True
     elif 0<= np.trace(np.dot(density,density))<1:
         return False
@@ -110,7 +117,8 @@ def kron_all(list):
 
 #this function will compute the partial trace and trace out certain qubit
 def trace_out(rho, out='1',check=False):
-    if min(np.shape(rho))==1:
+    if min(np.shape(rho))==1 or np.ndim(rho)==1:
+        row2col(rho)
         if check == True: check_state(rho)
         rho=density(rho)
     else:
@@ -130,22 +138,32 @@ def trace_out(rho, out='1',check=False):
     op1[int(out) - 1] = s1
 
     # make kron operation
-    reduced0 = np.dot(np.transpose(kron_all(op0)), np.dot(density, kron_all(op0)))
-    reduced1 = np.dot(np.transpose(kron_all(op1)), np.dot(density, kron_all(op1)))
+    reduced0 = np.dot(np.transpose(kron_all(op0)), np.dot(rho, kron_all(op0)))
+    reduced1 = np.dot(np.transpose(kron_all(op1)), np.dot(rho, kron_all(op1)))
     reduced = reduced0 + reduced1
 
     return reduced
 
+def prep_density_inpt(rho,check=False):
+    if min(np.shape(rho))==1 or np.ndim(rho)==1:
+        row2col(rho)
+        if check == True: check_state(rho)
+        rho=density(rho)
+    else:
+        if check == True: check_density(rho)
+    return rho
 
 #this function will calculate the trace distance given two density matrices
-def trace_distance(rho1, rho2):
+def trace_distance(rho1, rho2,check=False):
+    rho1=prep_density_inpt(rho1,check)
+    rho2=prep_density_inpt(rho2, check)
 
     A = rho1 - rho2
     eigA, vecA = LA.eig(A)
 
-    d = 0
+    t = 0
     for j in range(len(eigA)):
         if (eigA[j] > 0):
-            d = d + eigA[j]
+            t = t + eigA[j]
 
-    return d
+    return t

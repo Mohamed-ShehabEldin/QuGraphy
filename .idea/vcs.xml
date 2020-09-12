@@ -2,5 +2,7 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/The Quantum Error Correction Interactive Notebook/src/qugraphy" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/qugraphy" vcs="Git" />
   </component>
 </project>

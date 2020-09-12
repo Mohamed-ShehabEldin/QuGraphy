@@ -1,5 +1,5 @@
-from QuGraphy.density import *
-from QuGraphy.state import *
+from .density import *
+from .state import *
 import itertools
 
 def visualize_density(array, check=False):
