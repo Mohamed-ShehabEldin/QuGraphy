@@ -12,6 +12,7 @@ setup(
   url='https://github.com/Mohamed-ShehabEldin/QuGraphy',
   install_requires=[
     'qutip',
+    'qiskit',
     'numpy',
     'matplotlib'
   ]
